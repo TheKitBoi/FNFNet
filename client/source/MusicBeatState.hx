@@ -1,4 +1,6 @@
 package;
+import openfl.system.System;
+import lime.app.Application;
 #if sys
 import sys.io.File;
 #end
@@ -33,6 +35,8 @@ class MusicBeatState extends FlxUIState
 
 	override function create()
 	{
+		System.gc();
+		Application.current.window.title = FlxG.random.bool(0.000001)?"Vrijdag Nacht Funkin' Netwerk":"Friday Night Funkin' Network"; //extremely rare easter egg haha
 		topCam = new FlxCamera();
 		topCam.bgColor.alpha = 0;
 		FlxG.cameras.add(topCam, false);

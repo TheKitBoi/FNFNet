@@ -1,5 +1,11 @@
-package online;
+package;
 
+import openfl.events.Event;
+import flixel.graphics.frames.FlxAtlasFrames;
+import lime.app.Future;
+import openfl.display.BitmapData;
+import openfl.net.URLLoader;
+import openfl.net.URLRequestDefaults;
 import haxe.Json;
 import haxe.Http;
 import openfl.net.URLRequest;
@@ -18,13 +24,14 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import lime.utils.Assets;
 import io.colyseus.Client;
+
 import io.colyseus.Room;
 import Controls.*;
 
 using StringTools;
-
-class SingleplayerMods extends MusicBeatSubstate
+class FreeplayState extends MusicBeatSubstate
 {
+	public static var songname:String;
 	var modtxt:FlxText;
 	var modlist:ModMetaa = {mods: ['shits not right'], orig: ['TrollEngine'], madeby: ['bit of trolling'], desc: ['your shit doesnt work fix ASAP!']};
 	public static var bruh:Bool = false;
@@ -142,7 +149,7 @@ class SingleplayerMods extends MusicBeatSubstate
 
 			trace(md);
 		 */
-         var mdl = new haxe.Http("http://"+Config.data.resourceaddr+"/modlist.json");
+         var mdl = new haxe.Http("http://"+GlobalSettings.curAddress+"/modlist.json");
          mdl.onData = function(data:String){
              modlist = Json.parse(data);
              for (i in 0...modlist.mods.length){
@@ -156,7 +163,7 @@ class SingleplayerMods extends MusicBeatSubstate
                     songText.targetY = i;
                     grpSongs.add(songText);
         
-                    var icon:HealthIcon = new HealthIcon(songs[i].songCharacter);
+                    var icon:HealthIcon = new HealthIcon(songs[i].songName, false, true);
                     icon.sprTracker = songText;
         
                     // using a FlxGroup is too much fuss!
@@ -200,6 +207,7 @@ class SingleplayerMods extends MusicBeatSubstate
 				num++;
 		}
 	}
+	var disablecontrol:Bool = false;
 
 	override function update(elapsed:Float)
 	{
@@ -238,12 +246,15 @@ class SingleplayerMods extends MusicBeatSubstate
 			FlxG.switchState(new MainMenuState());
 		}
 
-		if (accepted)
+		if (accepted && !disablecontrol)
 		{
+
+				disablecontrol = true;
 				trace(songs[curSelected].songName.toLowerCase());
 				add(loadingtxt);
-				PlayStateOffline.modinst = new Sound(new URLRequest('http://'+Config.data.resourceaddr+'/songs/'+songs[curSelected].songName.toLowerCase()+'/Inst.ogg'));
-				PlayStateOffline.modvoices = new Sound(new URLRequest('http://'+Config.data.resourceaddr+'/songs/'+songs[curSelected].songName.toLowerCase()+'/Voices.ogg'));
+				URLRequestDefaults.idleTimeout = 300000;
+				PlayState.modinst = new Sound();
+				PlayState.modvoices = new Sound();
 				var modif = switch(curDifficulty){
 					case 0:
 						"-easy";
@@ -252,20 +263,26 @@ class SingleplayerMods extends MusicBeatSubstate
 					case 2:
 						"-hard";
 				}
-				var http = new haxe.Http('http://'+Config.data.resourceaddr+'/songs/'+songs[curSelected].songName.toLowerCase()+'/chart$modif.json');
-
+				var http = new haxe.Http('http://'+GlobalSettings.curAddress+'/songs/'+songs[curSelected].songName.toLowerCase()+'/chart$modif.json');
+				GlobalSettings.songDir = songs[curSelected].songName.toLowerCase();
 				http.onData = function (data:String) {
-					PlayStateOffline.SONG = Song.loadFromJson(data, songs[curSelected].songName.toLowerCase(), true);
-					PlayStateOffline.isStoryMode = false;
-					PlayStateOffline.storyDifficulty = curDifficulty;
+					PlayState.SONG = Song.loadFromJson(data, songs[curSelected].songName.toLowerCase(), true);
+					PlayState.isStoryMode = false;
+					PlayState.storyDifficulty = curDifficulty;
 		
-					PlayStateOffline.storyWeek = songs[curSelected].week;
+					PlayState.storyWeek = songs[curSelected].week;
 					//LoadingOnline.loadAndSwitchState(new PlayStateOnline());
-                    LoadingOnline.loadAndSwitchState(new PlayStateOffline());
+					PlayState.modinst.addEventListener(Event.COMPLETE, function(e:Event){
+						PlayState.modvoices.addEventListener(Event.COMPLETE, function(e:Event){
+							LoadingState.loadAndSwitchState(new PlayState());
+						});
+						PlayState.modvoices.load(new URLRequest('http://'+GlobalSettings.curAddress+'/songs/'+songs[curSelected].songName.toLowerCase()+'/Voices.ogg'));
+					});
+					PlayState.modinst.load(new URLRequest('http://'+GlobalSettings.curAddress+'/songs/'+songs[curSelected].songName.toLowerCase()+'/Inst.ogg'));
 				}
 
 				http.onError = function (error) {
-					FlxG.switchState(new FNFNetMenu());
+					FlxG.switchState(new MainMenuState());
 				}
 
 				http.request();
@@ -337,6 +354,7 @@ class SingleplayerMods extends MusicBeatSubstate
 	}
 	function changeDiff(change:Int = 0)
 	{
+		if(disablecontrol) return;
 		curDifficulty += change;
 
 		if (curDifficulty < 0)
@@ -361,6 +379,7 @@ class SingleplayerMods extends MusicBeatSubstate
 
 	function changeSelection(change:Int = 0)
 	{
+		if(disablecontrol) return;
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
 		curSelected += change;

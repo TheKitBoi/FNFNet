@@ -31,7 +31,6 @@ class FNFNetMenu extends MusicBeatState{
 
     public function new(error:String = ""){
         this.error = error;
-        trace("chungus");
         super();
     }
     override function create()
@@ -46,7 +45,7 @@ class FNFNetMenu extends MusicBeatState{
             logo.y = -160;
             logo.setGraphicSize(Std.int(logo.width / 1.6), Std.int(logo.height / 1.6));
             
-            jfc = new FlxInputText(50, 100, 150, "", 16);
+            jfc = new FlxInputText(50, 300, 150, "", 16);
             jbt = new FlxButton(jfc.x + 150, jfc.y, "Join", function(){
                 FlxG.switchState(new ConnectingState('battle', 'code', jfc.text));
             });
@@ -98,8 +97,18 @@ class FNFNetMenu extends MusicBeatState{
             errortxt = new Alphabet(0, FlxG.height * 0.90, error, true);
             errortxt.screenCenter(X);
             add(errortxt);
+            eventwheel = new FlxSprite(-150, -200).loadGraphic(Paths.image('eventwheel'));
+            var eventdata = new haxe.Http("http://"+Config.data.resourceaddr+"/event/event.json");
+            eventdata.onData = (data:Dynamic) -> {
+                var event = haxe.Json.parse(data);
+                if (Date.now().getTime() < event.deadline){
+                    add(eventwheel);
+                }
+            }
+            eventdata.request();
             super.create();
         }
+        var eventwheel:FlxSprite;
         override function update(elapsed:Float){
             super.update(elapsed);
             if(FlxG.keys.justPressed.LEFT) changeSelection(-1);
@@ -107,8 +116,9 @@ class FNFNetMenu extends MusicBeatState{
             if(FlxG.keys.justPressed.UP) changeSelection(-2);
             if(FlxG.keys.justPressed.DOWN) changeSelection(2);
             if(FlxG.keys.justPressed.ESCAPE) FlxG.switchState(new MainMenuState());
-            if(FlxG.keys.justPressed.F2) FlxG.switchState(new SingleplayerMods());
-
+            if(FlxG.mouse.overlaps(eventwheel) && FlxG.mouse.justPressed){
+                FlxG.switchState(new EventState());
+            }
             if(controls.ACCEPT){
                 switch(curSelected){
                 case 0:
@@ -132,11 +142,7 @@ class FNFNetMenu extends MusicBeatState{
                         for (room in rooms) {
                             exists = true;
                             remove(errortxt);
-                            errortxt = new Alphabet(0, errortxt.y, "Match found! Connecting", true);
-                            errortxt.screenCenter(X);
-                            add(errortxt);
-                            FlxG.switchState(new ConnectingState('battle', 'join'));
-
+                            FlxG.switchState(new RoomSelection());
                         }
                     });
                     //FlxG.switchState(new ConnectingState('battle', 'join'));

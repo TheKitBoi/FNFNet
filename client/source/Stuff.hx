@@ -1,7 +1,7 @@
 import io.colyseus.serializer.schema.Schema;
 import io.colyseus.serializer.schema.types.*;
 
-class Stuff extends Schema {
+class Stuff extends Schema { //this is the reason why fnfet is coded like shit kek
 	@:type("string")
 	public var message: String = "";
 
@@ -37,6 +37,9 @@ class Stuff extends Schema {
 
 	@:type("string")
 	public var finished: String = "";
+
+	@:type("int32")
+	public var hitsound: Int = 0;
 
 	@:type("int32")
 	public var retscore: Int = 0;

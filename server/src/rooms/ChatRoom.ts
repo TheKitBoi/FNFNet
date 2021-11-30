@@ -20,14 +20,14 @@ var users:Array<String> = new Array();
 var uuids:Array<String> = new Array();
 var hasAdmin:Array<Boolean> = new Array();
 var chatHistory:String;
-var thefullassmessage:String;
+var thefullassmessage:String = "";
 var test: number;
 var config = JSON.parse(fs.readFileSync("config.json", "utf-8"));
 const dsc = new discord();
 export class ChatRoom extends Room<Stuff> {
 
   public static stuff: string;
-  public static chatHistory: string;
+  public static chatHistory: string = "";
   onCreate (options: any) {
     this.setState(new Stuff());
     this.autoDispose = false;
@@ -41,6 +41,7 @@ export class ChatRoom extends Room<Stuff> {
       chatHistory += thefullassmessage + "\n";
       theY -= 16;
       this.broadcast('message',{ message: thefullassmessage});
+      ChatRoom.chatHistory = chatHistory as string;
       if(config.discord.enabled) dsc.send(config.discord.url, thefullassmessage);
     });
     

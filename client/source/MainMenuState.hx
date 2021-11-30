@@ -1,5 +1,6 @@
 package;
 
+import online.EventState;
 import openfl.net.URLRequest;
 import lime.app.Future;
 import openfl.display.BitmapData;
@@ -29,7 +30,7 @@ class MainMenuState extends MusicBeatState
 	public static var notPlaying:Bool;
 	var menuItems:FlxTypedGroup<FlxSprite>;
 
-	var optionShit:Array<String> = ['fnfnet', 'freeplay', 'options'];
+	var optionShit:Array<String> = ['fnfnet', 'freeplay', 'options', 'account'];
 	public static var exemel:String;
 	public static var char:BitmapData;
 	var magenta:FlxSprite;
@@ -98,6 +99,8 @@ class MainMenuState extends MusicBeatState
 			menuItem.animation.play('idle');
 			menuItem.ID = i;
 			menuItem.screenCenter(X);
+			
+			menuItem.alpha = (TitleState.outdated && optionShit[i] == "account") ? 0.5 : 1;
 			if(optionShit[i] == "fnfnet") {
 				menuItem.y -= 192; 
 				#if updatecheck
@@ -112,7 +115,7 @@ class MainMenuState extends MusicBeatState
 		#if charselection
 		var cst = Paths.getSparrowAtlas('chaselect');
 
-		var menuItem:FlxSprite = new FlxSprite(-200, 180);
+		var menuItem:FlxSprite = new FlxSprite(-500, 180);
 		menuItem.frames = cst;
 		menuItem.animation.addByPrefix('idle', "chaselect white", 24);
 		menuItem.animation.addByPrefix('selected', "chaselect basic", 24);
@@ -133,6 +136,8 @@ class MainMenuState extends MusicBeatState
 		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
 
+		var greeting = new EzText(0, 0, "Welcome, "+FlxG.save.data.username+"!", 30, 1);
+		if(!(FlxG.save.data.loggedin == false)) add(greeting); //doing this way is funny
 		// NG.core.calls.event.logEvent('swag').send();
 
 		changeItem();
@@ -179,10 +184,16 @@ class MainMenuState extends MusicBeatState
 				changeItem(1);
 			}
 			#end
-			if (FlxG.keys.justPressed.SIX) FlxG.openURL("https://www.youtube.com/watch?v=38FnpnflHEg");
-			if (FlxG.keys.justPressed.THREE) LoadingState.loadAndSwitchState(new test.TestState());
+			#if sys if(FlxG.keys.justPressed.F4) Config.data = haxe.Json.parse(sys.io.File.getContent("config.json")); #end
+			if (FlxG.keys.justPressed.THREE) LoadingState.loadAndSwitchState(new EventState());
+			if (FlxG.keys.justPressed.FOUR) LoadingState.loadAndSwitchState(new FourChan());
+			if (FlxG.keys.justPressed.NINE) LoadingState.loadAndSwitchState(new online.Login());
 			if (controls.ACCEPT)
 			{
+				if((optionShit[curSelected] == "account" || optionShit[curSelected] == "fnfnet") && TitleState.outdated){
+					FlxG.sound.play(Paths.sound("no"));
+					return;
+				}
 				if (optionShit[curSelected] == 'donate')
 					{
 						#if linux
@@ -228,7 +239,6 @@ class MainMenuState extends MusicBeatState
 										trace("Story Menu Selected");
 									case 'freeplay':
 										FlxG.switchState(new FreeplayState());
-
 										trace("Freeplay Menu Selected");
 									#if fnfnet
 									case 'fnfnet':
@@ -239,7 +249,12 @@ class MainMenuState extends MusicBeatState
 										FlxG.switchState(new online.FNFNetMenu());
 										#end
 									#end
-										
+									case 'account':
+										#if updatecheck
+										if(!TitleState.outdated) FlxG.switchState(!FlxG.save.data.loggedin?new online.Login():new online.Account());		
+										else FlxG.resetState();
+										FlxG.switchState(!FlxG.save.data.loggedin?new online.Login():new online.Account());	
+										#end			
 									case 'options':
 										FlxG.switchState(new OptionsMenu());
 								}

@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://lime.software/project/1.0.2 http://lime.software/xsd/project-1.0.2.xsd">
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="Friday Night Funkin' Network" file="FNFNet" packageName="com.ninjamuffin99.funkin" package="com.ninjamuffin99.funkin" main="Main" version="2.4" company="ninjamuffin99"/>
+	<app title="Friday Night Funkin' Network" file="FNFNet" packageName="com.ninjamuffin99.funkin" package="com.ninjamuffin99.funkin" main="Main" version="3.0" company="ninjamuffin99"/>
 
 	<!--Switch Export with Unique ApplicationID and Icon-->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
@@ -120,24 +120,26 @@
 	<haxelib name="flixel-addons" />
 	<haxelib name="hscript" />
 	<haxelib name="discord_rpc" />
+	<haxedef name="next"></haxedef>
 	<!--In case you want to use the ui package-->
 	<haxelib name="flixel-ui" />
 	<haxelib name="newgrounds"/>
 	<haxelib name="faxe" if='switch'/>
 	<haxelib name="polymod"/>
 	<haxelib name="hxcpp-debug-server" if="debug" unless="html5" />
+	<haxelib name="http-client"/>
 	<haxelib name="colyseus"/>
 	<haxelib name="discord_rpc" if="desktop"/>
 	<haxelib name="flixel-studio" if="debug"/>
 	<!-- TOGGLES FOR COMPILATION! REMOVE ONE IF YOU DON"T WANT ONE COMPILED -->
-	<haxelib name="crashdumper"/>
+	<haxelib name="crashdumper" if="desktop"/>
 	<haxedef name="HXCPP_STACK_LINE" /> 
 	<haxedef name="HXCPP_STACK_TRACE"/>
 	
 	<haxedef name="updatecheck" /> <!-- Check for Updates -->
 	<haxedef name="fnfnet" /> <!-- FNFNet -->
 	<haxedef name="charselection" /> <!-- Character Selection -->
-	<!-- <haxelib name="hxcpp-debug-server" if="desktop"/> -->
+	<haxelib name="hxcpp-debug-server" if="desktop"/>
 
 	<!-- <haxelib name="markdown" /> -->
 	<!-- <haxelib name="HtmlParser" /> -->

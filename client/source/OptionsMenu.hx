@@ -55,7 +55,6 @@ class OptionsMenu extends MusicBeatState
 			case "DFJK":
 				kbd = "DFJK";
 		}
-
 		var menuBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		controlsStrings = [
 			"< category >",
@@ -63,16 +62,19 @@ class OptionsMenu extends MusicBeatState
 			"Pause on Unfocus", 
 			"Fullscreen", 
 			"Downscroll", 
+			"Middle Scroll",
 			"Keyboard Scheme", 
 			"Scripts",
-			"Stage Tester",
+			#if !js "Stage Tester", #end 
 			"Kade Input", 
 			"Progress Bar", 
 			"Instant Restart",
 			"Inst Volume",
 			"Vocal Volume",
 			"Reset Settings",
-			"Load Custom Assets"
+			"Load Custom Assets",
+			"Logout",
+			"Login"
 		];// nop3CoolUtil.coolTextFile(Paths.txt('controls'));
 		var controlsDesc = [
 			"Change the category using left/right arrow keys.",
@@ -80,16 +82,19 @@ class OptionsMenu extends MusicBeatState
 			"Pause when you aren't focusing on the game.", 
 			"If the game should run on fullscreen.", 
 			"Downscrolling for arrows.", 
-			"Choose between WASD or DFJK.", 
+			"Middle scrolling for arrows.",
+			"Choose between WASD or DFJK.",
 			"Scripts that you can run.", 
-			"A easy test tool to port stages and characters.",
+			#if !js "A easy test tool to port stages and characters.", #end
 			"Activate input similar to Kade Engine.",
 			"A progression bar in-game to see how far you are in a song.",
 			"If you should restart when you die.",
 			"How loud instrumental should be.",
 			"How loud vocals should be.",
 			"Reset all your settings.",
-			"Choose if the game should load custom stages/characters."
+			"Choose if the game should load custom stages/characters.",
+			"Logout of your account.",
+			"Login into your account."
 		];
 
 		for(i in 0...controlsStrings.length){
@@ -174,16 +179,19 @@ class OptionsMenu extends MusicBeatState
 			Std.string(FlxG.autoPause), 
 			Std.string(FlxG.fullscreen), 
 			Std.string(FlxG.save.data.downscroll), 
+			Std.string(FlxG.save.data.midscroll),
 			kbd, 
 			"",
-			"",
+			#if !js "",#end
 			Std.string(FlxG.save.data.kadeinput),
 			Std.string(FlxG.save.data.pgbar), 
 			Std.string(FlxG.save.data.instres),
 			""+FlxG.save.data.instvolume,
 			""+FlxG.save.data.vocalsvolume,
 			"",
-			""+FlxG.save.data.loadass
+			""+FlxG.save.data.loadass,
+			"",
+			""
 		];
 			switch(grpControls.members[curSelected].text){
 				case "< category >":
@@ -194,8 +202,8 @@ class OptionsMenu extends MusicBeatState
 				case "Framerate":
 					if(controls.RIGHT_P) {
 						if(FlxG.drawFramerate < 300){
-							FlxG.drawFramerate += 10; 
-							FlxG.updateFramerate += 10; 
+							FlxG.drawFramerate = FlxG.updateFramerate += 10; 
+
 							FlxG.save.data.framerate = FlxG.drawFramerate;
 							FlxG.save.flush();
 							initSettings(false, 0, ""+FlxG.drawFramerate);
@@ -203,8 +211,7 @@ class OptionsMenu extends MusicBeatState
 					}
 					if(controls.LEFT_P) {
 						if(FlxG.drawFramerate > 20) {
-							FlxG.drawFramerate -= 10; 
-							FlxG.updateFramerate -= 10; 
+							FlxG.drawFramerate = FlxG.updateFramerate -= 10;
 							FlxG.save.data.framerate = FlxG.drawFramerate;
 							FlxG.save.flush();
 							initSettings(false, 0, "" + FlxG.drawFramerate);
@@ -280,6 +287,10 @@ class OptionsMenu extends MusicBeatState
 						FlxG.save.data.downscroll = PlayState.downscroll;
 						FlxG.save.flush();
 						initSettings(false, 3, ""+PlayState.downscroll);
+					case "Middle Scroll":
+						FlxG.save.data.midscroll = !FlxG.save.data.midscroll;
+						FlxG.save.flush();
+						initSettings(false, 4, ""+FlxG.save.data.midscroll);
 					case "Keyboard Scheme":
 						if(kbd == "WASD"){
 							kbd = "DFJK";
@@ -297,7 +308,7 @@ class OptionsMenu extends MusicBeatState
 					case "Scripts":
 						FlxG.switchState(new ScriptState());	
 					case "Stage Tester":	
-						LoadingState.loadAndSwitchState(new test.TestState());	
+						#if !js LoadingState.loadAndSwitchState(new test.TestState());	#end
 
 					case "Kade Input":
 						if(FlxG.save.data.kadeinput != null)FlxG.save.data.kadeinput = !FlxG.save.data.kadeinput;
@@ -318,6 +329,11 @@ class OptionsMenu extends MusicBeatState
 						FlxG.save.data.loadass = !FlxG.save.data.loadass;
 						FlxG.save.flush();
 						initSettings(false, 7, FlxG.save.data.loadass);	
+					case "Logout":
+						Config.logout();
+						FlxG.switchState(new MainMenuState());
+					case "Login":
+						FlxG.switchState(new online.Login());
 					case "big chungus":
 						var request = new haxe.Http("https://fnf.general-infinity.tech/thing.php");
 						request.setPostData("no=no");
@@ -424,6 +440,13 @@ class OptionsMenu extends MusicBeatState
 		}
 	}
 	function controlChange(){
+		
+		var acctab = switch(FlxG.save.data.loggedin){
+			case true:
+				'Logout';
+			case false:
+				'Login';
+		}
 		var chungus = switch(curtab){
 			case 0:
 			[
@@ -437,6 +460,7 @@ class OptionsMenu extends MusicBeatState
 					'< category >',
 					'Load Custom Assets',
 					'Downscroll',
+					'Middle Scroll',
 					'Keyboard Scheme',
 					'Kade Input',
 					'Instant Restart'
@@ -450,8 +474,10 @@ class OptionsMenu extends MusicBeatState
 				[
 					'< category >',
 					'Scripts',
-					'Stage Tester',
-				'Reset Settings'];
+					#if !js 'Stage Tester',#end
+					'Reset Settings',
+					acctab
+				];
 			case _:
 				['shit doesnt work'];
 		}

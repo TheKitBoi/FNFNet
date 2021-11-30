@@ -4,7 +4,6 @@ package;
 import crashdumper.CrashDumper;
 import crashdumper.SessionData;
 #end
-import polymod.Polymod.Framework;
 import lime.utils.AssetCache;
 import Controls;
 import flixel.util.FlxSave;
@@ -54,6 +53,18 @@ class TitleState extends MusicBeatState
 
 	override public function create():Void
 	{
+		/*var assetMap:Map<String, String> = new Map<String, String>();
+		var shitass:Array<String> = ['shared', 'characters', 'week1', 'week2', 'week3', 'week4', 'week5', 'week6'];
+		for(ass in shitass){
+			assetMap.set(ass, ass);
+		}
+		polymod.Polymod.init({
+			modRoot:"mods",
+			dirs:["characters", "introMod"],
+			frameworkParams: {assetLibraryPaths: assetMap}
+		});
+		*/
+		FlxG.sound.muteKeys = [NUMPADZERO];
 		if( FlxG.save.data.pauseonunfocus != null) FlxG.autoPause = FlxG.save.data.pauseonunfocus;
 		#if crashdumper
 		var unique_id:String = SessionData.generateID("FNFNet_"); 
@@ -126,11 +137,7 @@ class TitleState extends MusicBeatState
 			DiscordClient.shutdown();
 		 });
 		#end
-		//Application.current.onWindowMove((x:Float, y:Float) -> {});
-
-		#if debug
-		flixel.addons.studio.FlxStudio.create();
-		#end
+		//Application.current.onWindowMove((x:Float, y:Float) -> {});\
 	}
 
 	var logoBl:FlxSprite;
@@ -190,15 +197,16 @@ class TitleState extends MusicBeatState
 		logoBl.updateHitbox();
 		// logoBl.screenCenter();
 		// logoBl.color = FlxColor.BLACK;
+		var funny = CoolUtil.numberArray(15, 0);
+		funny.insert(0, 30);
 
 		gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.07);
 		gfDance.frames = Paths.getSparrowAtlas('gfDanceTitle');
-		gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
-		gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
+		gfDance.animation.addByIndices('danceLeft', 'gfDance', funny, "", 24, false);
+		gfDance.animation.addByIndices('danceRight', 'gfDance', CoolUtil.numberArray(30, 15), "", 24, false); //[15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
 		gfDance.antialiasing = true;
 		add(gfDance);
 		add(logoBl);
-
 		titleText = new FlxSprite(100, FlxG.height * 0.8);
 		titleText.frames = Paths.getSparrowAtlas('titleEnter');
 		titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);

@@ -1,5 +1,8 @@
 package;
 
+import lime.app.Application;
+import openfl.display.BitmapData;
+import openfl.display.Bitmap;
 import flixel.FlxGame;
 import flixel.FlxG;
 import flixel.FlxState;
@@ -35,7 +38,15 @@ class Main extends Sprite
 	{	
 		Lib.current.addChild(new Main());
 	}
-
+	public function traceSomethingDependingOnPlatform(something:String){
+		#if cpp
+		cpp.Lib.println(something);
+		#elseif js
+		js.Lib.console.log(something);
+		#elseif php
+		php.Lib.println(something);
+		#end
+	}
 	public function new()
 	{
 //		var s = getContent("config.json");
@@ -88,12 +99,15 @@ class Main extends Sprite
 			gameWidth = Math.ceil(stageWidth / zoom);
 			gameHeight = Math.ceil(stageHeight / zoom);
 		}
-
+		
 		#if !debug
 		initialState = TitleState;
 		#end
+		GlobalSettings.init();
 		addChild(new FlxGame(gameWidth, gameHeight, initialState, zoom, framerate, framerate, skipSplash, startFullscreen));
-
+		#if debug
+		flixel.addons.studio.FlxStudio.create();
+		#end
 		#if !mobile
 		addChild(new FPS(10, 3, 0xFFFFFF));
 		#end

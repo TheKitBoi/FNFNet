@@ -7,9 +7,9 @@
  * Colyseus Server as documented here: 👉 https://docs.colyseus.io/server/api/#constructor-options 
  */
 import { listen } from "@colyseus/arena";
-
+const { port } =  require('../config.json');
 // Import arena config
 import arenaConfig from "./arena.config";
 
 // Create and listen on 2567 (or PORT environment variable.)
-listen(arenaConfig);
+listen(arenaConfig, port);

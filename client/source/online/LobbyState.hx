@@ -1,4 +1,7 @@
 package online;
+import flixel.util.FlxTimer;
+import flixel.addons.text.FlxTypeText;
+import flixel.addons.ui.FlxUICheckBox;
 #if sys
 import Discord.DiscordClient;
 #end
@@ -27,7 +30,7 @@ class LobbyState extends MusicBeatState{
     public static var songdata:ConnectingState.SongData = {song: '', week: 1, difficulty: 1};
     public static var roomcode:FlxText;
     public static var code:String;
-
+    var options:EzText;
     var p1name:FlxText;
     var p2name:FlxText;
     var readybtn:FlxButton;
@@ -35,6 +38,22 @@ class LobbyState extends MusicBeatState{
     public static var playertxt:FlxTypedGroup<FlxText>;
 
     override function create(){
+        var letypingsound = FlxG.sound.load(Paths.sound('pixelText'), 0.6);
+        rooms.onMessage('bubble', (message)-> {
+            var haxemoment = message.p1?0:20;
+            var haxemoment2 = message.p1?ConnectingState.p1name:ConnectingState.p2name;
+            var ttext = new FlxTypeText(5, 50 + haxemoment, FlxG.width - 405, haxemoment2+": "+message.message, 24);
+            ttext.setFormat(Paths.font('vcr.ttf'), 24, FlxColor.WHITE);
+            ttext.setBorderStyle(OUTLINE, FlxColor.BLACK, 2); //300 modifier btw
+            ttext.antialiasing = true;
+            ttext.sounds = [letypingsound];
+            ttext.start(null, false, false, null, ()->{
+                new FlxTimer().start(3, (tmr:FlxTimer)->{
+                    remove(ttext);
+                });
+            });
+            add(ttext);
+        });
         PlayStateOnline.playedgame = false;
         var songname = songdata.song;
         var songweek = songdata.week;
@@ -63,6 +82,8 @@ class LobbyState extends MusicBeatState{
         roomcode = new FlxText(5, FlxG.height *0.001, 0, "Room code: " + code, 12);
         roomcode.scrollFactor.set();
         roomcode.setFormat("VCR OSD Mono", 32, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+        roomcode.setBorderStyle(OUTLINE, FlxColor.BLACK, 2);
+        options = new EzText(1000, FlxG.height *0.91, "", 32, 2);
 
         p1 = new FlxSprite(180, 303);
         p1.frames = Paths.getSparrowAtlas('BOYFRIEND');
@@ -76,7 +97,12 @@ class LobbyState extends MusicBeatState{
         p2.animation.addByPrefix('idle', 'BF idle dance', 24, true);
         p2.animation.play("idle");
         p2.alpha = 0;
-        if(ConnectingState.conmode == 'join')p2.alpha = 1;
+        if(ConnectingState.conmode == 'join'){
+            p2color = FlxG.save.data.loggedin?FlxColor.YELLOW:FlxColor.WHITE;
+            p2.alpha = 1;
+        }else{
+            p1color = FlxG.save.data.loggedin?FlxColor.YELLOW:FlxColor.WHITE;
+        }
         p1name = new FlxText(p1.x + 100, p1.y - 30);
         p2name = new FlxText(p2.x + 100, p2.y - 30);
         
@@ -85,6 +111,8 @@ class LobbyState extends MusicBeatState{
 
         p2name.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, LEFT);
 		p2name.setBorderStyle(OUTLINE, FlxColor.BLACK, 1);
+
+
 
         playertxt = new FlxTypedGroup<FlxText>();
         var ptxt = new FlxText(p1.x, p1.y, 0, "Not Ready");
@@ -139,17 +167,35 @@ class LobbyState extends MusicBeatState{
             ready = !ready;
             if(ready) readybtn.text = "Unready";
             else readybtn.text = "Ready";
-            rooms.send("misc", {ready: ready});
+            try{rooms.send("misc", {ready: ready});}catch(e){FlxG.switchState(new FNFNetMenu());}
+        });
+        //readybtn.scale.set(1.5, 1.5);
+        //readybtn.updateHitbox();
+
+        var bubbox = new FlxInputText(50, 130, 300);
+        bubbox.background = true;
+        bubbox.backgroundColor = FlxColor.WHITE;
+        bubbox.borderColor = 0xFFFFFFFF;
+        var bubblesend = new FlxButton(bubbox.x - 1, bubbox.y + 15, "Send Message", function(){
+            try{
+                rooms.send("bubble", {message: bubbox.text});
+                bubbox.text = "";
+                bubbox.caretIndex = 0;
+            }catch(e){
+                FlxG.switchState(new FNFNetMenu());
+            }
         });
 
+        var vsmodecheckbox = new FlxUICheckBox(50, 100, null, null, "VS Mode");
+        vsmodecheckbox.checked = true;
         var namebtn = new FlxButton(usnbox.x, usnbox.y + 15, "Change Name", function(){
             if(usnbox.text != ""){
                 if(ConnectingState.conmode == "host")ConnectingState.p1name = usnbox.text;
                 else ConnectingState.p2name = usnbox.text;
                 usnbox.text = "";
                 usnbox.caretIndex = 0;
-                if(ConnectingState.conmode == "host")rooms.send("chatHist", {name: ConnectingState.p1name});
-                else rooms.send("chatHist", {name: ConnectingState.p2name});
+                if(ConnectingState.conmode == "host")try{rooms.send("chatHist", {name: ConnectingState.p1name});}catch(e){FlxG.switchState(new FNFNetMenu());}
+                else try{rooms.send("chatHist", {name: ConnectingState.p2name});}catch(e){FlxG.switchState(new FNFNetMenu());}
             }
         });
 
@@ -167,33 +213,63 @@ class LobbyState extends MusicBeatState{
 		//tab_group_song.add(UI_songTitle);
         //tab_group.add(characterdropdown);
         tab_group.add(readybtn);
-        tab_group.add(usnbox);
-        tab_group.add(namebtn);
+        if(!FlxG.save.data.loggedin){
+            tab_group.add(usnbox);
+            tab_group.add(namebtn);
+        }
         tab_info.add(info);
+        tab_group.add(bubblesend);
+        tab_group.add(bubbox);
         UI_box.addGroup(tab_group);
         UI_box.addGroup(tab_info);
+        if(ConnectingState.conmode == "host"){
+            ConnectingState.options.actualVsMode = true;
+            tab_group.add(vsmodecheckbox);
+        }
         add(stageCurtains);
         add(p1);
         add(p2);
         add(p1name);
         add(p2name);
         add(playertxt);
+        add(options);
         add(UI_box);
         if(ConnectingState.conmode != "join")add(roomcode);
 
         super.create();
     }
 
+    public static var p1color:FlxColor = FlxColor.WHITE;
+    public static var p2color:FlxColor = FlxColor.WHITE;
+    
     override function update(elapsed:Float){
+        options.text = 'VS Mode: ${ConnectingState.options.actualVsMode}';
         p1name.text = ConnectingState.p1name;
         p2name.text = ConnectingState.p2name;
+        p1name.color = p1color;
+        p2name.color = p2color;
+
         if(PlayStateOnline.startedMatch){
             LoadingOnline.loadAndSwitchState(new PlayStateOnline());
         }
         if(FlxG.keys.justPressed.ESCAPE) {
-            rooms.leave();
+            try{rooms.leave();}catch(e){trace(e);}
             FlxG.switchState(new FNFNetMenu());
         }
         super.update(elapsed);
     }
+    override function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>)
+        {
+            if (id == FlxUICheckBox.CLICK_EVENT)
+            {
+                var check:FlxUICheckBox = cast sender;
+                var label = check.getLabel().text;
+                switch (label)
+                {
+                    case 'VS Mode':
+                        ConnectingState.options.actualVsMode = !ConnectingState.options.actualVsMode;
+                        rooms.send('optionchange', {vsMode: ConnectingState.options.actualVsMode});
+                }
+            }
+        }
 }

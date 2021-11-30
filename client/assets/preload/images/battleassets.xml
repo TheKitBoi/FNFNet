@@ -2,24 +2,22 @@
 <TextureAtlas imagePath="battleassets.png">
 	<!-- Created with Adobe Flash Professional version 15.0.0.173 -->
 	<!-- http://www.adobe.com/products/flash.html -->
-	<SubTexture name="Symbol 10000" x="340" y="0" width="93" height="80" frameX="0" frameY="0" frameWidth="143" frameHeight="80"/>
 	<SubTexture name="back0000" x="0" y="0" width="340" height="121"/>
-	<SubTexture name="hand0000" x="340" y="0" width="93" height="80" frameX="-50" frameY="0" frameWidth="143" frameHeight="80"/>
-	<SubTexture name="hand0001" x="0" y="121" width="93" height="80" frameX="0" frameY="0" frameWidth="143" frameHeight="80"/>
-	<SubTexture name="hand0002" x="340" y="0" width="93" height="80" frameX="-23" frameY="0" frameWidth="143" frameHeight="80"/>
-	<SubTexture name="hand0003" x="340" y="0" width="93" height="80" frameX="-12" frameY="0" frameWidth="143" frameHeight="80"/>
-	<SubTexture name="hand0004" x="340" y="0" width="93" height="80" frameX="-14" frameY="0" frameWidth="143" frameHeight="80"/>
-	<SubTexture name="hand0005" x="340" y="0" width="93" height="80" frameX="-16" frameY="0" frameWidth="143" frameHeight="80"/>
-	<SubTexture name="hand0006" x="340" y="0" width="93" height="80" frameX="-13" frameY="0" frameWidth="143" frameHeight="80"/>
-	<SubTexture name="hand0007" x="340" y="0" width="93" height="80" frameX="-16" frameY="0" frameWidth="143" frameHeight="80"/>
-	<SubTexture name="hand0008" x="340" y="0" width="93" height="80" frameX="-14" frameY="0" frameWidth="143" frameHeight="80"/>
-	<SubTexture name="hand0009" x="340" y="0" width="93" height="80" frameX="-15" frameY="0" frameWidth="143" frameHeight="80"/>
-	<SubTexture name="hand0010" x="340" y="0" width="93" height="80" frameX="-15" frameY="0" frameWidth="143" frameHeight="80"/>
-	<SubTexture name="hand0011" x="340" y="0" width="93" height="80" frameX="-15" frameY="0" frameWidth="143" frameHeight="80"/>
-	<SubTexture name="hand0012" x="340" y="0" width="93" height="80" frameX="-15" frameY="0" frameWidth="143" frameHeight="80"/>
-	<SubTexture name="hand0013" x="340" y="0" width="93" height="80" frameX="-15" frameY="0" frameWidth="143" frameHeight="80"/>
-	<SubTexture name="hand_textbox.png" x="495" y="501" width="17" height="11"/>
-	<SubTexture name="join from code0000" x="110" y="121" width="340" height="121"/>
+	<SubTexture name="hand0000" x="340" y="0" width="104" height="79" frameX="-51" frameY="0" frameWidth="155" frameHeight="79"/>
+	<SubTexture name="hand0001" x="0" y="121" width="104" height="79" frameX="0" frameY="0" frameWidth="155" frameHeight="79"/>
+	<SubTexture name="hand0002" x="340" y="0" width="104" height="79" frameX="-23" frameY="0" frameWidth="155" frameHeight="79"/>
+	<SubTexture name="hand0003" x="340" y="0" width="104" height="79" frameX="-12" frameY="0" frameWidth="155" frameHeight="79"/>
+	<SubTexture name="hand0004" x="340" y="0" width="104" height="79" frameX="-15" frameY="0" frameWidth="155" frameHeight="79"/>
+	<SubTexture name="hand0005" x="340" y="0" width="104" height="79" frameX="-17" frameY="0" frameWidth="155" frameHeight="79"/>
+	<SubTexture name="hand0006" x="340" y="0" width="104" height="79" frameX="-13" frameY="0" frameWidth="155" frameHeight="79"/>
+	<SubTexture name="hand0007" x="340" y="0" width="104" height="79" frameX="-16" frameY="0" frameWidth="155" frameHeight="79"/>
+	<SubTexture name="hand0008" x="340" y="0" width="104" height="79" frameX="-14" frameY="0" frameWidth="155" frameHeight="79"/>
+	<SubTexture name="hand0009" x="340" y="0" width="104" height="79" frameX="-15" frameY="0" frameWidth="155" frameHeight="79"/>
+	<SubTexture name="hand0010" x="340" y="0" width="104" height="79" frameX="-15" frameY="0" frameWidth="155" frameHeight="79"/>
+	<SubTexture name="hand0011" x="340" y="0" width="104" height="79" frameX="-15" frameY="0" frameWidth="155" frameHeight="79"/>
+	<SubTexture name="hand0012" x="340" y="0" width="104" height="79" frameX="-15" frameY="0" frameWidth="155" frameHeight="79"/>
+	<SubTexture name="hand0013" x="340" y="0" width="104" height="79" frameX="-15" frameY="0" frameWidth="155" frameHeight="79"/>
+	<SubTexture name="join from code0000" x="104" y="121" width="340" height="121"/>
 	<SubTexture name="login0000" x="0" y="242" width="340" height="121"/>
-	<SubTexture name="matchmaking0000" x="0" y="363" width="348" height="121"/>
+	<SubTexture name="matchmaking0000" x="0" y="363" width="340" height="121"/>
 </TextureAtlas>
