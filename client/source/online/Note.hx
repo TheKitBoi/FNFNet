@@ -25,7 +25,6 @@ class Note extends FlxSprite
 	public var isSustainNote:Bool = false;
 
 	public var noteScore:Float = 1;
-	public static var single:Bool = false;
 	public static var swagWidth:Float = 160 * 0.7;
 	public static var PURP_NOTE:Int = 0;
 	public static var GREEN_NOTE:Int = 2;
@@ -49,12 +48,7 @@ class Note extends FlxSprite
 
 		this.noteData = noteData;
 
-		var daStage:String = switch(single){
-			case false:
-				online.PlayStateOnline.curStage;
-			case true:
-				online.PlayStateOffline.curStage;
-		};
+		var daStage:String = online.PlayStateOnline.curStage;
 
 		switch (daStage)
 		{
@@ -81,12 +75,9 @@ class Note extends FlxSprite
 					animation.add('bluehold', [1]);
 				}
 
-				setGraphicSize(Std.int(width * switch(single){
-					case false:
-						online.PlayStateOnline.daPixelZoom;
-					case true:
-						online.PlayStateOffline.daPixelZoom;
-				}));
+				setGraphicSize(Std.int(width * 
+						online.PlayStateOnline.daPixelZoom
+				));
 				updateHitbox();
 
 			default:
@@ -153,12 +144,7 @@ class Note extends FlxSprite
 
 			x -= width / 2;
 
-			if (switch(single){
-				case false:
-					online.PlayStateOnline.curStage.startsWith('school');
-				case true:
-					online.PlayStateOffline.curStage.startsWith('school');
-			})
+			if (online.PlayStateOnline.curStage.startsWith('school'))
 				x += 30;
 
 			if (prevNote.isSustainNote)
@@ -175,12 +161,7 @@ class Note extends FlxSprite
 						prevNote.animation.play('redhold');
 				}
 
-				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.5 * switch(single){
-					case false:
-						online.PlayStateOnline.SONG.speed;
-					case true:
-						online.PlayStateOffline.SONG.speed;
-				};
+				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.5 * online.PlayStateOnline.SONG.speed;
 				prevNote.updateHitbox();
 				// prevNote.setGraphicSize();
 			}
@@ -195,7 +176,7 @@ class Note extends FlxSprite
 		{
 			// The * 0.5 is so that it's easier to hit them too late, instead of too early
 			if (strumTime > Conductor.songPosition - Conductor.safeZoneOffset
-				&& strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * 0.69))
+				&& strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * 0.5))
 				canBeHit = true;
 			else
 				canBeHit = false;

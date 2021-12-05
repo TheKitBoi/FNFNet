@@ -25,6 +25,10 @@ export class Stuff extends Schema {
 
   @type("string") songname: string;
 
+  @type("string") bubble: string;
+
+  @type("string") hitnote : number
+
   @type('int32') retnumber: number;
 
   @type("int32") axY: Number = 0;

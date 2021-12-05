@@ -1,5 +1,6 @@
 package online;
 
+import haxe.Json;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.FlxSprite;
@@ -91,16 +92,45 @@ class BattleResultSubState extends MusicBeatSubstate
 		Conductor.songPosition = 0;
 		loseorwin.cameras = [camHUD];
 		
+		if(FlxG.save.data.loggedin){
+			funnytext = new EzText(loseorwin.x + 300, loseorwin.y + 450, "Account Score: ", 40, 3);
+			funnytext.cameras = [camHUD];
+			scorecheck();
+			add(funnytext);
+		}
 		add(loseorwin);
 		add(aktc);
 		add(low);
+	
 		FlxG.sound.playMusic(Paths.music('breakfast'));
 		Conductor.changeBPM(100);
-
+		if(FlxG.save.data.loggedin) scorecheck();
 		// FlxG.camera.followLerp = 1;
 		// FlxG.camera.focusOn(FlxPoint.get(FlxG.width / 2, FlxG.height / 2));
 		//FlxG.camera.scroll.set();
 		//FlxG.camera.target = null;
+	}
+	var funnytext:EzText;
+
+	public function scorecheck(){
+        var request = new haxe.http.HttpRequest();
+        request.method = "POST";
+        request.url = new haxe.http.Url("http://"+Config.data.addr+":"+Config.data.port+"/login/");
+        request.headers.set("Content-Type", "application/json");
+		request.data = '{"username":"${FlxG.save.data.username}", "password":"${FlxG.save.data.password}", "action":"${lose?"lose":"win"}", "value": 0}';
+        request.send({
+          onData: function (data : String) {
+			  var stuff = Json.parse(data);
+			  var rs = stuff.score;
+			  var pointthing = lose?1:5; //haxe dissapoints yet again
+				funnytext.text = "Account Score: "+stuff.oldscore + " + " + pointthing + " = " + rs;
+          },
+          onError: function (error : String, ?data : String) {
+			  
+          },
+          onStatus: function (code : Int) {
+          }
+        });
 	}
 
 	override function update(elapsed:Float)

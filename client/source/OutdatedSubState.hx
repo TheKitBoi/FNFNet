@@ -17,7 +17,7 @@ class OutdatedSubState extends MusicBeatState
 		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		add(bg);
 		var txt:FlxText = new FlxText(0, 0, FlxG.width,
-			#if fnfnet "HEY! You're running an outdated version of TrollEngine!\nFNFNet will not work until you update.\n\nPress space to open the mod page.\n\nPress ESC to continue anyway without FNFNet.", 
+			#if fnfnet "HEY! You're running an outdated version of Friday Night Funkin' Network!\nFNFNet will not work until you update.\n\nPress space to open the mod page.\n\nPress ESC to continue anyway without Multiplayer.", 
 			#else "HEY! You're running an outdated version of TrollEngine!\n\nPress space to open the mod page.\n\nPress ESC to continue anyway without FNFNet.", 
 			#end
 			32);
@@ -32,9 +32,9 @@ class OutdatedSubState extends MusicBeatState
 		{
 			leftState = true;
 			#if linux
-			Sys.command('/usr/bin/xdg-open', ["https://gamebanana.com/mods/166622", "&"]);
+			Sys.command('/usr/bin/xdg-open', ["https://gamebanana.com/mods/307671", "&"]);
 			#else
-			FlxG.openURL('https://gamebanana.com/mods/166622');
+			FlxG.openURL('https://gamebanana.com/mods/307671');
 			#end
 		}
 		if (controls.BACK)

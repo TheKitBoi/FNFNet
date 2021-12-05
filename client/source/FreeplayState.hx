@@ -1,5 +1,8 @@
 package;
 
+import flixel.tweens.FlxTween;
+import flixel.tweens.misc.ColorTween;
+import openfl.events.Event;
 import flixel.graphics.frames.FlxAtlasFrames;
 import lime.app.Future;
 import openfl.display.BitmapData;
@@ -49,13 +52,12 @@ class FreeplayState extends MusicBeatSubstate
 	var cutText:FlxText;
 	var dumbText:FlxText;
 	var gimText:FlxText;
-	var orgin:FlxText;
 	var creator:FlxText;
 	var scoreBG:FlxSprite;
 	var desc:FlxText;
 	var lerpScore:Int = 0;
 	var intendedScore:Int = 0;
-
+	var state:State = CAT;
 	private var grpSongs:FlxTypedGroup<Alphabet>;
 	private var curPlaying:Bool = false;
 
@@ -88,9 +90,9 @@ class FreeplayState extends MusicBeatSubstate
 
 		// LOAD CHARACTERS
 
-		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuBGBlue'));
+		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		add(bg);
-
+		colortwn = FlxTween.color(bg, 1, bg.color, FlxG.random.int(0, 16777215));
 		grpSongs = new FlxTypedGroup<Alphabet>();
 		add(grpSongs);
 		add(iconArray);
@@ -99,9 +101,6 @@ class FreeplayState extends MusicBeatSubstate
 		// scoreText.autoSize = false;
 		scoreText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, RIGHT);
 		// scoreText.alignment = RIGHT;
-
-		orgin = new FlxText(scoreText.x, scoreText.y + 72, 0, "Origin:", 20);
-		orgin.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, RIGHT);
 
 		creator = new FlxText(scoreText.x, scoreText.y + 102, 0, "Made By:", 20);
 		creator.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, RIGHT);
@@ -112,11 +111,11 @@ class FreeplayState extends MusicBeatSubstate
 		scoreBG = new FlxSprite(scoreText.x - 6, 0).makeGraphic(Std.int(FlxG.width * 0.45), 105, 0xFF000000);
 		scoreBG.alpha = 0.6;
         scoreBG.setGraphicSize(Std.int(scoreBG.width), Std.int(scoreBG.height + 700));
-		add(scoreBG);
+		//add(scoreBG);
 
 		diffText = new FlxText(scoreText.x, scoreText.y + 36, 0, "", 24);
 		diffText.font = scoreText.font;
-		add(diffText);
+		//add(diffText);
 
 		loadingtxt = new Alphabet(0, 0, "Loading Songs please wait...", true);
 		loadingtxt.screenCenter(XY);
@@ -148,40 +147,10 @@ class FreeplayState extends MusicBeatSubstate
 
 			trace(md);
 		 */
-         var mdl = new haxe.Http("http://"+Config.data.resourceaddr+"/modlist.json");
+         var mdl = new haxe.Http("http://"+GlobalSettings.curAddress+"/mods.json");
          mdl.onData = function(data:String){
              modlist = Json.parse(data);
-             for (i in 0...modlist.mods.length){
-                addSong(modlist.mods[i], 1, 'face');
-            }
-            curSelected = 0;
-            for (i in 0...modlist.mods.length)
-                {
-                    var songText:Alphabet = new Alphabet(0, (70 * i) + 30, songs[i].songName, true, false);
-                    songText.isMenuItem = true;
-                    songText.targetY = i;
-                    grpSongs.add(songText);
-        
-                    var icon:HealthIcon = new HealthIcon(songs[i].songCharacter);
-                    icon.sprTracker = songText;
-        
-                    // using a FlxGroup is too much fuss!
-                    iconArray.add(icon);
-        
-                    // songText.x += 40;
-                    // DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
-                    // songText.screenCenter(X);
-                }
-                add(grpSongs);
-                add(iconArray);
-                add(orgin);
-                add(creator);
-                add(desc);
-                orgin.text = "Origin: " + modlist.orig[curSelected];
-                creator.text = "Made By: " + modlist.madeby[curSelected];
-                desc.text = "Description: " + modlist.desc[curSelected];
-                changeSelection();
-                changeDiff();
+			 init2();
          }
          mdl.request();
 		super.create();
@@ -189,7 +158,7 @@ class FreeplayState extends MusicBeatSubstate
 
 	public function addSong(songName:String, weekNum:Int, songCharacter:String)
 	{
-		songs.push(new SongMetadataa(songName, weekNum, songCharacter));
+		songs.push(new SongMetadataa(songName, weekNum, songCharacter.toLowerCase()));
 	}
 
 	public function addWeek(songs:Array<String>, weekNum:Int, ?songCharacters:Array<String>)
@@ -206,7 +175,7 @@ class FreeplayState extends MusicBeatSubstate
 				num++;
 		}
 	}
-
+	var disablecontrol:Bool = false;
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
@@ -241,19 +210,19 @@ class FreeplayState extends MusicBeatSubstate
 
 		if (controls.BACK)
 		{
+			if(state == SONG) return init2();
 			FlxG.switchState(new MainMenuState());
 		}
 
-		if (accepted)
+		if (accepted && !disablecontrol)
 		{
+				if(state == CAT) return init();
+				disablecontrol = true;
 				trace(songs[curSelected].songName.toLowerCase());
 				add(loadingtxt);
-				URLRequestDefaults.idleTimeout = 300000;
-				var inststream = new URLRequest('http://'+Config.data.resourceaddr+'/songs/'+songs[curSelected].songName.toLowerCase()+'/Inst.ogg');
-				var voicestream = new URLRequest('http://'+Config.data.resourceaddr+'/songs/'+songs[curSelected].songName.toLowerCase()+'/Voices.ogg');
-				voicestream.idleTimeout = 30;
-				PlayState.modinst = new Sound(inststream);
-				PlayState.modvoices = new Sound(voicestream);
+				//URLRequestDefaults.idleTimeout = 300000;
+				PlayState.modinst = new Sound();
+				PlayState.modvoices = new Sound();
 				var modif = switch(curDifficulty){
 					case 0:
 						"-easy";
@@ -262,8 +231,8 @@ class FreeplayState extends MusicBeatSubstate
 					case 2:
 						"-hard";
 				}
-				var http = new haxe.Http('http://'+Config.data.resourceaddr+'/songs/'+songs[curSelected].songName.toLowerCase()+'/chart$modif.json');
-				songname = songs[curSelected].songName.toLowerCase();
+				var http = new haxe.Http('http://'+GlobalSettings.curAddress+'/songs/'+songs[curSelected].songName.toLowerCase()+'/chart$modif.json');
+				GlobalSettings.songDir = songs[curSelected].songName.toLowerCase();
 				http.onData = function (data:String) {
 					PlayState.SONG = Song.loadFromJson(data, songs[curSelected].songName.toLowerCase(), true);
 					PlayState.isStoryMode = false;
@@ -271,7 +240,13 @@ class FreeplayState extends MusicBeatSubstate
 		
 					PlayState.storyWeek = songs[curSelected].week;
 					//LoadingOnline.loadAndSwitchState(new PlayStateOnline());
-					LoadingState.loadAndSwitchState(new PlayState());
+					PlayState.modinst.addEventListener(Event.COMPLETE, function(e:Event){
+						PlayState.modvoices.addEventListener(Event.COMPLETE, function(e:Event){
+							LoadingState.loadAndSwitchState(new PlayState());
+						});
+						PlayState.modvoices.load(new URLRequest('http://'+GlobalSettings.curAddress+'/songs/'+songs[curSelected].songName.toLowerCase()+'/Voices.ogg'));
+					});
+					PlayState.modinst.load(new URLRequest('http://'+GlobalSettings.curAddress+'/songs/'+songs[curSelected].songName.toLowerCase()+'/Inst.ogg'));
 				}
 
 				http.onError = function (error) {
@@ -293,35 +268,20 @@ class FreeplayState extends MusicBeatSubstate
 //		}
 	}
 	function init(){
+		state = SONG;
 		modtab = false;
 		add(dumbText);
-		scoreBG.setGraphicSize(Std.int(scoreBG.width), 105);
+		//scoreBG.setGraphicSize(Std.int(scoreBG.width), 105);
 		songs = [];
-		addWeek(['Tutorial', 'Test'], 1, ['gf', 'bf-pixel']);
-		if (StoryMenuState.weekUnlocked[2])
-			addWeek(['Bopeebo', 'Fresh', 'Dadbattle'], 1, ['dad']);
-
-		if (StoryMenuState.weekUnlocked[2])
-			addWeek(['Spookeez', 'South', 'Monster'], 2, ['spooky', 'spooky', 'monster']);
-
-		if (StoryMenuState.weekUnlocked[3])
-			addWeek(['Pico', 'Philly', 'Blammed'], 3, ['pico']);
-
-		if (StoryMenuState.weekUnlocked[4])
-			addWeek(['Satin-Panties', 'High', 'Milf'], 4, ['mom']);
-
-		if (StoryMenuState.weekUnlocked[5])
-			addWeek(['Cocoa', 'Eggnog', 'Winter-Horrorland'], 5, ['parents-christmas', 'parents-christmas', 'monster-christmas']);
-
-		if (StoryMenuState.weekUnlocked[6])
-			addWeek(['Senpai', 'Roses', 'Thorns'], 6, ['senpai', 'senpai', 'spirit']);
-
 		remove(grpSongs);
 		remove(iconArray);
 		grpSongs.clear();
 		iconArray.clear();
 		grpSongs = new FlxTypedGroup<Alphabet>();
 		iconArray= new FlxTypedGroup<HealthIcon>();
+		for (i in 0...modlist.mods[curSelected].songs.length){
+			addSong(modlist.mods[curSelected].songs[i].name, 1, modlist.mods[curSelected].songs[i].name);
+		}
 		for (i in 0...songs.length)
 			{
 				var songText:Alphabet = new Alphabet(0, (70 * i) + 30, songs[i].songName, true, false);
@@ -329,7 +289,57 @@ class FreeplayState extends MusicBeatSubstate
 				songText.targetY = i;
 				grpSongs.add(songText);
 	
-				var icon:HealthIcon = new HealthIcon(songs[i].songCharacter);
+				var icon:HealthIcon = new HealthIcon(songs[i].songCharacter, false, !false);
+				icon.sprTracker = songText;
+	
+				// using a FlxGroup is too much fuss!
+				iconArray.add(icon);
+
+				// songText.x += 40;
+				// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
+				// songText.screenCenter(X);
+			}
+			add(grpSongs);
+			add(scoreBG);
+			add(scoreText);
+			add(iconArray);
+			add(creator);
+			add(desc);
+			add(diffText);
+			catSelected = curSelected;
+			curSelected = 0;
+			changeSelection();
+			changeDiff();
+	}
+	var catSelected:Int = 0;
+	function init2(){
+		state = CAT;
+		modtab = false;
+		add(dumbText);
+		//scoreBG.setGraphicSize(Std.int(scoreBG.width), 105);
+		songs = [];
+		remove(grpSongs);
+		remove(iconArray);
+		remove(scoreBG);
+		remove(scoreText);
+		remove(iconArray);
+		remove(creator);
+		remove(desc);
+		remove(diffText);
+		grpSongs.clear();
+		iconArray.clear();
+		for (i in 0...modlist.mods.length){
+			addSong(modlist.mods[i].name, 1, modlist.mods[i].songs[0].name);
+		}
+		curSelected = 0;
+		for (i in 0...modlist.mods.length)
+			{
+				var songText:Alphabet = new Alphabet(0, (70 * i) + 30, songs[i].songName, true, false);
+				songText.isMenuItem = true;
+				songText.targetY = i;
+				grpSongs.add(songText);
+
+				var icon:HealthIcon = new HealthIcon(songs[i].songCharacter, false, true);
 				icon.sprTracker = songText;
 	
 				// using a FlxGroup is too much fuss!
@@ -341,12 +351,16 @@ class FreeplayState extends MusicBeatSubstate
 			}
 			add(grpSongs);
 			add(iconArray);
-			remove(orgin);
-			remove(creator);
-			remove(desc);
+			//add(orgin);
+			//add(creator);
+			//add(desc);
+			//orgin.text = "Origin: " + modlist.orig[curSelected];
+			changeSelection();
+			changeDiff();
 	}
 	function changeDiff(change:Int = 0)
 	{
+		if(disablecontrol) return;
 		curDifficulty += change;
 
 		if (curDifficulty < 0)
@@ -371,17 +385,24 @@ class FreeplayState extends MusicBeatSubstate
 
 	function changeSelection(change:Int = 0)
 	{
+		if(disablecontrol) return;
+		
+
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
 		curSelected += change;
-
 		if (curSelected < 0)
 			curSelected = songs.length - 1;
 		if (curSelected >= songs.length)
 			curSelected = 0;
-		orgin.text = "Origin: " + modlist.orig[curSelected];
-		creator.text = "Made By: " + modlist.madeby[curSelected];
-		desc.text = "Description: " + modlist.desc[curSelected];
+		
+		if(state == SONG){
+			creator.text = "Made By: " + modlist.mods[catSelected].creator;
+			desc.text = "Description: " + modlist.mods[catSelected].songs[curSelected].description;
+		}
+		//orgin.text = "Origin: " + modlist.orig[curSelected];
+		//creator.text = "Made By: " + modlist.madeby[curSelected];
+		//desc.text = "Description: " + modlist.desc[curSelected];
 		// selector.y = (70 * curSelected) + 30;
 
 		#if !switch
@@ -412,7 +433,14 @@ class FreeplayState extends MusicBeatSubstate
 				// item.setGraphicSize(Std.int(item.width));
 			}
 		}
+		var coolor = CoolUtil.dominantColor(iconArray.members[curSelected]);
+		if(!colortwn.finished)colortwn.cancel();
+		colortwn = FlxTween.color(bg, 1, bg.color, coolor);
+		prevColor = coolor;
 	}
+	var bg:FlxSprite;
+	var prevColor:FlxColor;
+	var colortwn:FlxTween;
 }
 
 class SongMetadataa
@@ -430,8 +458,14 @@ class SongMetadataa
 }
 
 typedef ModMetaa = {
-	mods:Array<String>,
+	mods:Array<Dynamic>,
 	orig:Array<String>,
 	madeby:Array<String>,
 	desc:Array<String>
+}
+
+enum State
+{
+	CAT;
+	SONG;
 }

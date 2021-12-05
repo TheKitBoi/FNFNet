@@ -5,10 +5,10 @@ import flixel.text.FlxText;
 
 class EzText extends FlxText
 {
-    public function new(x:Float, y:Float, text:String, size:Int, bordersize:Int){
+    public function new(x:Float = 0, y:Float = 0, text:String = "", size:Int = 8, bordersize:Int = 1, color:FlxColor = FlxColor.WHITE){
         super(x, y, 0, text);
         scrollFactor.set();
-		setFormat(Paths.font('vcr.ttf'), size);
+		setFormat(Paths.font('vcr.ttf'), size, color);
 		updateHitbox();
 		setBorderStyle(OUTLINE, FlxColor.BLACK, bordersize); //300 modifier btw
 		antialiasing = true;

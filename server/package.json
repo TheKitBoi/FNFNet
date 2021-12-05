@@ -35,6 +35,9 @@
     "@colyseus/arena": "^0.14.9",
     "@colyseus/monitor": "^0.14.0",
     "@colyseus/social": "^0.10.9",
+    "@types/bcrypt": "^5.0.0",
+    "@types/sqlite3": "^3.1.7",
+    "bcrypt": "^5.0.1",
     "colyseus": "^0.14.0",
     "cors": "^2.8.5",
     "cross-fetch": "^3.1.4",
@@ -42,6 +45,7 @@
     "mocha": "^9.0.0",
     "node-fetch": "^2.6.1",
     "react": "^17.0.2",
-    "serve-index": "^1.9.1"
+    "serve-index": "^1.9.1",
+    "sqlite3": "^5.0.2"
   }
 }

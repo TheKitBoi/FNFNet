@@ -6,8 +6,7 @@ import fetch from 'cross-fetch';
 */
 export class discord {
     send(url:string, message:String){
-        var data = { content: message.replace("@everyone", "@iamsuperfunny").replace("@here", "@iamsuperfunny"), allowed_mentions: false
-          };
+        var data = { content: message.replace("@everyone", "also i love dicks btw").replace("@here", "also i love dicks btw"), allowed_mentions: false};
 
         //POST request with body equal on data in JSON format
         fetch(url, {
@@ -19,7 +18,7 @@ export class discord {
         });
     }
     battle(url:string, message:String, p1name:string, p2name:string, p1score:number, p2score:number, whowon:string, song:string){
-        var data = { content: message.replace("@everyone", "@iamsuperfunny").replace("@here", "@iamsuperfunny"), allowed_mentions: false, embeds: [{
+        var data = { content: message.replace("@everyone", "also i love dicks btw").replace("@here", "also i love dicks btw"), allowed_mentions: false, embeds: [{
             "title": whowon + " won the battle in " + song + "!",
             "fields": [
               {

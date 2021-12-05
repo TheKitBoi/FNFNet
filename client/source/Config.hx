@@ -15,15 +15,15 @@ typedef ConfigData = {
 /**
  *Use the .data method to grab config data.
  
- width = window width
+ @param width window width
 
- height = window height
+ @param height window height
 
- fullscreen = if fullscreen is enabled
+ @param fullscreen if fullscreen is enabled
 
- addr = address for FNFNet
+ @param addr address for FNFNet
  
- port = port for FNFNet
+ @param port port for FNFNet
  */
 class Config {
     #if desktop
@@ -40,6 +40,11 @@ class Config {
     
     public static var data:ConfigData = haxe.Json.parse(s);
     #end
+    public static function logout(){
+        FlxG.save.data.loggedin = false;
+        FlxG.save.data.username = null;
+        FlxG.save.data.password = null;
+    }
     public static function initsave(reset:Bool = false){
         if(!FlxG.save.data.played || reset){
             FlxG.save.data.played = true;
@@ -47,19 +52,23 @@ class Config {
             FlxG.save.data.framerate = 60;
             FlxG.save.data.pauseonunfocus = true;
             FlxG.save.data.fullscreen = false;
-            FlxG.save.data.downscroll = false;
-            FlxG.save.data.kadeinput = false;
             FlxG.save.data.pgbar = false;
             FlxG.save.data.instres = false;
             FlxG.save.data.instvolume = 100;
             FlxG.save.data.vocalsvolume = 100;
+            FlxG.save.data.loggedin = false;
+            FlxG.save.data.downscroll = false;
+            FlxG.save.data.kadeinput = true;
+            FlxG.save.data.midscroll = false;
             FlxG.save.flush();
         }
         else{
             (FlxG.save.data.loadass == null) ? FlxG.save.data.loadass=true:FlxG.save.data.loadass == FlxG.save.data.loadass;
+            if(FlxG.save.data.loggedin == null) FlxG.save.data.loggedin = false;
+            if(FlxG.save.data.midscroll == null) FlxG.save.data.midscroll = false;
+            if(FlxG.save.data.downscroll == null) FlxG.save.data.downscroll = false;
             FlxG.autoPause = FlxG.save.data.pauseonunfocus;
-            FlxG.drawFramerate = FlxG.save.data.framerate;
-            FlxG.updateFramerate = FlxG.save.data.framerate;
+            FlxG.drawFramerate = FlxG.updateFramerate = FlxG.save.data.framerate;
         }
     }
 }

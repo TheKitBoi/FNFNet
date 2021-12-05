@@ -1,4 +1,5 @@
 {
+    "port": 2567,
     "discord": {
         "enabled": true,
         "url": "https://discord.com/api/webhooks/851922902336274453/zp9-YzMMbUm6F3zSmPhevPCsk7miNJngIxRdZOE8YnyxrsPWgB78ZQyddl0TND7zDdf-",

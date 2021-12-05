@@ -21,7 +21,7 @@ class Character extends FlxSprite
 
 	public var isPlayer:Bool = false;
 	public var curCharacter:String = 'bf';
-
+	public var camPos:{x:Null<Int>, y:Null<Int>} = {x: 0, y: 0};
 	public var holdTimer:Float = 0;
 
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)

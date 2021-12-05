@@ -1,0 +1,37 @@
+<script>
+    //var parsed = JSON.parse(json);
+    var realjson = JSON.parse("{}");
+    
+
+    
+    thefunny();
+    function thefunny(){
+        fetch('modlist.json')
+        .then(response => response.json())
+        .then(jsonResponse => {
+            var parserdata = jsonResponse; // too lazy /shrug
+	    realjson["mods"] = [];
+        var shitpos = 0;
+        for(var i=0; i<parserdata.orig.length; i++){
+            var prevorig = parserdata.orig[i-1];
+            if(prevorig != parserdata.orig[i]){
+                shitpos = i;
+                realjson.mods.push({name: parserdata.orig[i], creator: parserdata.madeby[i], songs: [{name: parserdata.mods[i], description: parserdata.desc[i]}]});
+                //realjson.mods[shitpos].songs.push();
+            }
+            else {
+                console.log(realjson);
+                realjson.mods[realjson.mods.length-1].songs.push({name: parserdata.mods[i], description: parserdata.desc[i]});
+            }
+		//if(realjson.mods["name"] == null) realjson.mods["name"] = parserdata.orig[i];
+		//else {}
+		//if(realjson[parserdata.orig[i]] == null)realjson[parserdata.orig[i]] = {};
+		//if(realjson[parserdata.orig[i]]["song"] == null) realjson[parserdata.orig[i]]["song"] = [];
+		
+		//realjson[parserdata.orig[i]]["song"].push({name: parserdata.mods[i], description: parserdata.desc[i]});
+	    }
+    	    console.log(realjson);
+            //jqueryfunny(JSON.stringify(parserdata));
+        });
+    }
+</script>
